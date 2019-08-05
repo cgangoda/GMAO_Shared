@@ -239,9 +239,13 @@
       subroutine init ( infile, NFILES_MAX, nfiles,
      .                          synhour, nonames, nosort, outfile, ncf )
 
+!!USES:
+
+      use m_ods_obsdiags, only : ods_obsdiags_setparam
+      implicit NONE
+
 ! !INPUT PARAMETERS:
 !
-      implicit NONE
       integer,       intent(in)  :: nfiles_max
 !
 ! !OUTPUT PARAMETERS:
@@ -261,6 +265,8 @@
 ! !REVISION HISTORY:
 !
 !       21Sep98 - D.Dee   Initial code
+!        3Apr19 - Sienkiewicz - added '-prepsigo' (use with -ncf)
+!                             to write original sigo
 !
 !EOP
 !BOC
@@ -270,6 +276,9 @@
       integer iret, i, lv, iarg, argc, iargc
       character*255 argv
       character*2 HH
+      logical adjsigo
+
+      adjsigo = .true.
 
 !     Parse command line
 !     ------------------
@@ -292,6 +301,8 @@
             nosort = .TRUE.
          elseif (index(argv,'-ncf') .gt. 0 ) then
             ncf = .TRUE.
+         elseif (index(argv,'-prepsigo') .gt. 0) then
+            adjsigo = .FALSE.
          elseif (index(argv,'-synhour') .gt. 0 ) then
             if ( iarg+1 .gt. argc ) call usage()
             iarg = iarg + 1
@@ -335,6 +346,10 @@
       end do
       print *
       print *, 'Output filename: ', outfile
+
+      if (ncf) then
+         call ods_obsdiags_setparam('ladjsigo',adjsigo)
+      endif
 
       return
 

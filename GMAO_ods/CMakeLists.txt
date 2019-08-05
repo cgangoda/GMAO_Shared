@@ -31,7 +31,7 @@ set (ODSSRC
   ods_julhr.f     ods_ncp_itoi2.f  ods_resetp.f     odsnxtime.f
   ods_eget.f      ods_dcget.f      ods_dconv.f      ods_dcscan.f
   ods_drad.f      ods_dsbuv.f      ods_dpcp.f       ods_rmdupl.f
-  ods_do3lev.f 
+  ods_do3lev.f    ods_diagnc4.f90
   )
 
 # This is equivalent to FOPT=$(FOPT3) in GNU Make
