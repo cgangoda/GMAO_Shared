@@ -30,6 +30,13 @@ module diagnc4_read
   integer, parameter, public  :: r_single = selected_real_kind(6)  ! single precision
   integer, parameter, public  :: r_double = selected_real_kind(15) ! double precision
 
+  interface get_1d_var
+     module procedure get_1d_double_var_
+     module procedure get_1d_real_var_
+     module procedure get_1d_int_var_
+     module procedure get_1d_char_var_
+  end interface get_1d_var
+
   
 contains
 
@@ -58,7 +65,7 @@ contains
     return
   end function get_dim
     
-  subroutine get_1d_double_var(ncid,name,values,rc)
+  subroutine get_1d_double_var_(ncid,name,values,rc)
     integer,           intent(in) :: ncid
     character(len = *),intent(in) :: name
     real(r_double)    ,intent(out):: values(:)
@@ -68,7 +75,7 @@ contains
     rc = 0
     status = nf90_inq_varid(ncid,name,varid)
     if (status /= nf90_noerr) then
-       print *,'error reading ', name
+       print *,'inquire error reading ', name
        rc = 2
        status = nf90_close(ncid)
        return
@@ -81,9 +88,9 @@ contains
        return
     end if
     return
-  end subroutine get_1d_double_var
+  end subroutine get_1d_double_var_
   
-  subroutine get_1d_real_var(ncid,name,values,rc)
+  subroutine get_1d_real_var_(ncid,name,values,rc)
     integer,           intent(in) :: ncid
     character(len = *),intent(in) :: name
     real(r_single)    ,intent(out):: values(:)
@@ -93,7 +100,7 @@ contains
     rc = 0
     status = nf90_inq_varid(ncid,name,varid)
     if (status /= nf90_noerr) then
-       print *,'error reading ', name
+       print *,'inquire error reading ', name
        rc = 2
        status = nf90_close(ncid)
        return
@@ -106,9 +113,9 @@ contains
        return
     end if
     return
-  end subroutine get_1d_real_var
+  end subroutine get_1d_real_var_
   
-  subroutine get_1d_int_var(ncid,name,ivalues,rc)
+  subroutine get_1d_int_var_(ncid,name,ivalues,rc)
     integer,           intent(in) :: ncid
     character(len = *),intent(in) :: name
     integer(i_kind)   ,intent(out):: ivalues(:)
@@ -118,7 +125,7 @@ contains
     rc = 0
     status = nf90_inq_varid(ncid,name,varid)
     if (status /= nf90_noerr) then
-       print *,'error reading ', name
+       print *,'inquire error reading ', name
        rc = 2
        status = nf90_close(ncid)
        return
@@ -131,9 +138,9 @@ contains
        return
     end if
     return
-  end subroutine get_1d_int_var
+  end subroutine get_1d_int_var_
   
-  subroutine get_1d_char_var(ncid,name,cvalues,rc)
+  subroutine get_1d_char_var_(ncid,name,cvalues,rc)
     integer,           intent(in) :: ncid
     character(len = *),intent(in) :: name
     character(len = *),intent(out):: cvalues(:)
@@ -143,7 +150,7 @@ contains
     rc = 0
     status = nf90_inq_varid(ncid,name,varid)
     if (status /= nf90_noerr) then
-       print *,'error reading ', name
+       print *,'inquire error reading ', name
        rc = 2
        status = nf90_close(ncid)
        return
@@ -156,8 +163,56 @@ contains
        return
     end if
     return
-  end subroutine get_1d_char_var
- 
+  end subroutine get_1d_char_var_
+
+  subroutine get_2d_int_var(ncid,name,values,rc)
+    integer,           intent(in) :: ncid
+    character(len = *),intent(in) :: name
+    integer(i_kind)   ,intent(out):: values(:,:)
+    integer           ,intent(out):: rc
+    integer                       :: status
+    integer                       :: varid
+    rc = 0
+    status = nf90_inq_varid(ncid,name,varid)
+    if (status /= nf90_noerr) then
+       print *,'inquire error reading ', name
+       rc = 2
+       status = nf90_close(ncid)
+       return
+    end if
+    status = nf90_get_var(ncid, varid, values)
+    if (status /= nf90_noerr) then
+       print *,'error reading ', name,', status= ',status
+       rc = 2
+       status = nf90_close(ncid)
+       return
+    end if
+  end subroutine get_2d_int_var
+
+  subroutine get_2d_double_var(ncid,name,values,rc)
+    integer,           intent(in) :: ncid
+    character(len = *),intent(in) :: name
+    real(r_double)    ,intent(out):: values(:,:)
+    integer           ,intent(out):: rc
+    integer                       :: status
+    integer                       :: varid
+    rc = 0
+    status = nf90_inq_varid(ncid,name,varid)
+    if (status /= nf90_noerr) then
+       print *,'inquire error reading ', name
+       rc = 2
+       status = nf90_close(ncid)
+       return
+    end if
+    status = nf90_get_var(ncid, varid, values)
+    if (status /= nf90_noerr) then
+       print *,'error reading ', name,', status=',status 
+       rc = 2
+       status = nf90_close(ncid)
+       return
+    end if
+  end subroutine get_2d_double_var
+
 end module diagnc4_read
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +234,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
 !  use netcdf
   use diagnc4_read
   use m_Sndx,    only : setSndx
-  use m_ods_obsdiags, only : ods_obsdiags_getparam
+  use m_ods_obsdiags, only : ods_obsdiags_getparam, ods_obsdiags
 
 
   implicit none
@@ -202,7 +257,8 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
 !   2019-04-16 - Sienkiewicz - Initial code from standalone nc4diag2ods
 !   2019-04-22 - Sienkiewicz - added 'spd' and 'sst' processing
 !   2019-05-21 - Sienkiewicz - replace nc_diag_read routines
-!
+!   2019-08-28 - Sienkiewicz - polymorphic get_1d_var, initial implementation
+!                               of sensitivity processing 
 !EOP
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   
@@ -212,8 +268,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
   logical verbose
   logical satknown
   real, parameter :: undef = 1.e15
-  integer nchan_dim, nspot, i, j, n, knt, isat, kidsat, ii
-  integer ioffset, iargc, narg
+  integer nchan_dim, nspot, i, j, jj, n, knt, isat, kidsat, ii
   integer clen, stlen
   integer statks
   integer status
@@ -225,6 +280,17 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
 
   character(len=20) isis
   character(len=10) dplat,satype,diag_type
+
+  integer iiuse, inldpt, itldpt, iobssen
+  integer iunldpt, ivnldpt, iutldpt, ivtldpt, iuobssen, ivobssen
+  integer ndiag, ioff
+  integer, allocatable :: obs_iuse(:,:)
+  real(r_single)     :: nlomx(2), tlomx(2), obimp(2)
+  real(r_single), allocatable :: pdata(:,:)
+  real(r_double), allocatable :: u_obs_nldepart(:,:), u_obs_tldepart(:,:),  &
+       u_obs_obssen(:,:), v_obs_nldepart(:,:), v_obs_tldepart(:,:), v_obs_obssen(:,:), &
+       obs_nldepart(:,:), obs_tldepart(:,:), obs_obssen(:,:)
+  logical passed
 
   integer, parameter :: nnln = 8
   character(len=*), parameter :: nlnqct(nnln)=(/ ' dw', ' ps', 'tcp', '  q', &
@@ -253,7 +319,6 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
   verbose = .true.
 
   nymdh = 0
-  ioffset = 0
 
   rc = 0
 
@@ -428,39 +493,45 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      return
   end if
 
-  allocate(ivals(nobs),rvals(nobs),rvals2(nobs),sigo(nobs))
+  allocate(ivals(nobs),rvals(nobs),rvals2(nobs),sigo(nobs),stat=ierr)
+  if (ierr /= 0) then
+     print *, 'error alllocating arrays for reading data, ierr= ',ierr
+     rc = 7
+     status = nf90_close(input_id)
+     return
+  end if
 
 !  Fields common to all data types - latitude, longitude, obs, omf
 !  ---------------------------------------------------------------  
-  call get_1d_real_var(input_id,'Latitude',rvals,rc)
+  call get_1d_var(input_id,'Latitude',rvals,rc)
   if (rc /= 0) return
   ods%data%lat(1:nobs) = rvals
-  call get_1d_real_var(input_id,'Longitude',rvals,rc)
+  call get_1d_var(input_id,'Longitude',rvals,rc)
   if (rc /= 0) return
   where( rvals > 180)  rvals = rvals - 360.
   ods%data%lon(1:nobs) = rvals
 
   if (diag_type == 'uvconv') then
-     call get_1d_real_var(input_id,'u_Observation',rvals,rc)
+     call get_1d_var(input_id,'u_Observation',rvals,rc)
      if (rc /= 0) return
      ods%data%obs(1:nobs) = rvals
-     call get_1d_real_var(input_id,'u_Obs_Minus_Forecast_adjusted',rvals,rc)
+     call get_1d_var(input_id,'u_Obs_Minus_Forecast_adjusted',rvals,rc)
      if (rc /= 0) return
      ods%data%omf(1:nobs) = rvals
-     call get_1d_real_var(input_id,'v_Observation',rvals,rc)
+     call get_1d_var(input_id,'v_Observation',rvals,rc)
      if (rc /= 0) return     
      ods%data%obs(nobs1:nobs_ods) = rvals
-     call get_1d_real_var(input_id,'v_Obs_Minus_Forecast_adjusted',rvals,rc)
+     call get_1d_var(input_id,'v_Obs_Minus_Forecast_adjusted',rvals,rc)
      if (rc /= 0) return
      ods%data%omf(nobs1:nobs_ods) = rvals
 
      ods%data%lat(nobs1:nobs_ods) = ods%data%lat(1:nobs)
      ods%data%lon(nobs1:nobs_ods) = ods%data%lon(1:nobs)
   else
-     call get_1d_real_var(input_id,'Observation',rvals,rc)
+     call get_1d_var(input_id,'Observation',rvals,rc)
      if (rc /= 0) return
      ods%data%obs = rvals
-     call get_1d_real_var(input_id,'Obs_Minus_Forecast_adjusted',rvals,rc)
+     call get_1d_var(input_id,'Obs_Minus_Forecast_adjusted',rvals,rc)
      if (rc /= 0) return
      ods%data%omf = rvals
   end if
@@ -474,17 +545,17 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      nchan_dim = get_dim(input_id,'nchans',rc)
      if (rc /= 0) return
 
-     call get_1d_real_var(input_id,'Obs_Time',rvals,rc)
+     call get_1d_var(input_id,'Obs_Time',rvals,rc)
      if (rc /= 0) return
      ods%data%time = int(rvals * 60.)            ! use 'int' to match diag_bin time
-     call get_1d_int_var(input_id,'Channel_Index',ivals,rc)
+     call get_1d_var(input_id,'Channel_Index',ivals,rc)
      if (rc /= 0) return
      ods%data%lev = float(ivals)
-     call get_1d_real_var(input_id,'Obs_Minus_Forecast_unadjusted',rvals,rc)
+     call get_1d_var(input_id,'Obs_Minus_Forecast_unadjusted',rvals,rc)
      if (rc /= 0) return
      ods%data%xm=rvals-ods%data%omf
 
-     call get_1d_real_var(input_id,'Inverse_Observation_Error',rvals,rc)
+     call get_1d_var(input_id,'Inverse_Observation_Error',rvals,rc)
      if (rc /= 0) return
 
      sigo = undef
@@ -495,7 +566,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
         where (rvals > small_num)  sigo = 1.0/rvals
      else
         allocate(varchn(nchan_dim))
-        call get_1d_double_var(input_id,'error_variance',varchn,rc)
+        call get_1d_var(input_id,'error_variance',varchn,rc)
         if (rc /= 0) return
 
         varchn = sqrt(varchn)
@@ -505,11 +576,11 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      ods%data%Xvec = sigo       ! radiance Xvec
      
      allocate(iuse(nchan_dim))
-     call get_1d_int_var(input_id,'use_flag',iuse,rc)
+     call get_1d_var(input_id,'use_flag',iuse,rc)
      if (rc /= 0) return
      ivals = 0
      where(rvals <= small_num) ivals = 2
-     call get_1d_real_var(input_id,'QC_Flag',rvals,rc)
+     call get_1d_var(input_id,'QC_Flag',rvals,rc)
      if (rc /= 0) return
      where( rvals < 0 ) ivals  = 1
      do i = 1,nchan_dim
@@ -536,11 +607,11 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
 
      ods%data%kx = kidsat
 
-     call get_1d_real_var(input_id,'Time',rvals,rc)
+     call get_1d_var(input_id,'Time',rvals,rc)
      if (rc /= 0) return
      ods%data%time = int(rvals * 60.)
 
-     call get_1d_real_var(input_id,'Reference_Pressure',rvals,rc)
+     call get_1d_var(input_id,'Reference_Pressure',rvals,rc)
      if (rc /= 0) return
      ods%data%lev = rvals
     
@@ -579,7 +650,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
 
      sigo = undef
      ivals = 0
-     call get_1d_real_var(input_id,'Inverse_Observation_Error',rvals,rc)
+     call get_1d_var(input_id,'Inverse_Observation_Error',rvals,rc)
      if (rc /= 0) return
      where(rvals > small_num)
         sigo = 1./rvals
@@ -598,30 +669,30 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      stlen = get_dim(input_id, 'Station_ID_maxstrlen',rc)
      if (rc /= 0) return
      allocate(character(len=stlen) :: station(nobs))
-     call get_1d_char_var(input_id,'Station_ID',station,rc)
+     call get_1d_var(input_id,'Station_ID',station,rc)
      if (rc /= 0) return
 
-     call get_1d_real_var(input_id,'Time',rvals,rc)
+     call get_1d_var(input_id,'Time',rvals,rc)
      if (rc /= 0) return
      ods%data%time(1:nobs) = int(rvals * 60,)
 
-     call get_1d_int_var(input_id,'Observation_Type',ivals,rc)
+     call get_1d_var(input_id,'Observation_Type',ivals,rc)
      if (rc /= 0) return
      ods%data%kx(1:nobs) = ivals
 
-     call get_1d_real_var(input_id,'Pressure',rvals,rc)
+     call get_1d_var(input_id,'Pressure',rvals,rc)
      if (rc /= 0) return
      ods%data%lev(1:nobs) = rvals
  
      ivals = 0
-     call get_1d_real_var(input_id, 'Analysis_Use_Flag',rvals,rc)
+     call get_1d_var(input_id, 'Analysis_Use_Flag',rvals,rc)
      if (rc /= 0) return
      where( rvals < 0 ) ivals = X_PASSIVE
 
      sigo = undef
-     call get_1d_real_var(input_id,'Errinv_Final',rvals,rc)
+     call get_1d_var(input_id,'Errinv_Final',rvals,rc)
      if (rc /= 0) return
-     call get_1d_real_var(input_id,'Nonlinear_QC_Rel_Wgt',rvals2,rc)
+     call get_1d_var(input_id,'Nonlinear_QC_Rel_Wgt',rvals2,rc)
      if (rc /= 0) return
 !
 ! use nonlin QC mark where rel weight < 1  (overrides X_PASSIVE)
@@ -633,7 +704,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      if (ladjsigo) then                ! use adjusted sigo
         rvals2 = rvals
      else                              ! use input sigo
-        call get_1d_real_var(input_id,'Errinv_Input',rvals2,rc)
+        call get_1d_var(input_id,'Errinv_Input',rvals2,rc)
         if (rc /= 0) return
      end if
 
@@ -659,17 +730,17 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      case ('gps') 
 !!TO_DO - need GPS rdiag(19) 'hob' vertical grid location, to use 
 !!        for adjusting error with pressure values == 0.0
-        call get_1d_real_var(input_id,'GPS_Type',rvals,rc)
+        call get_1d_var(input_id,'GPS_Type',rvals,rc)
         if (rc /= 0) return
         
         if(rvals(1) == 0) then               ! assuming homogeneous file
            ods%data%kt= ktGPSr
-           call get_1d_real_var(input_id,'Model_Elevation',rvals,rc)
+           call get_1d_var(input_id,'Model_Elevation',rvals,rc)
            if (rc /= 0) return
            ods%data%xm = rvals
         else
            ods%data%kt= ktGPSb
-           call get_1d_real_var(input_id,'Height',rvals,rc)
+           call get_1d_var(input_id,'Height',rvals,rc)
            if (rc /= 0) return
            ods%data%xm = rvals
         endif
@@ -678,7 +749,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
         if (any(ods%data%lev == 0.0)) then
            status = nf90_inq_varid(input_id,'Vertical_Grid_Location',varid)
            if (status == nf90_noerr) then
-              call get_1d_real_var(input_id,'Vertical_Grid_Location',rvals,rc)
+              call get_1d_var(input_id,'Vertical_Grid_Location',rvals,rc)
               if (rc /= 0) return
               do i = 1,nobs
                  if (ods%data%lev(i) == 0.0) then
@@ -695,7 +766,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      case (' ps', 'tcp')  ! surface pressure
         ods%data%kt= ktps2m
         ods%data%lev = undef
-        call get_1d_real_var(input_id,'Height',rvals,rc)
+        call get_1d_var(input_id,'Height',rvals,rc)
         if (rc /= 0) return
         ods%data%xm = rvals
 
@@ -703,7 +774,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
         ods%data%kt= ktqq        ! specific humidity
         ods%data%obs = 1.e3*ods%data%obs
         ods%data%omf = 1.e3*ods%data%omf
-        call get_1d_real_var(input_id,'Forecast_Saturation_Spec_Hum',rvals,rc)
+        call get_1d_var(input_id,'Forecast_Saturation_Spec_Hum',rvals,rc)
         if (rc /= 0) return
         ods%data%xm = 1.e3*rvals
         where(sigo /= undef) ods%data%Xvec = 1.e3*sigo      ! adjust Q Xvec
@@ -711,7 +782,7 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
      case ('spd')
         ods%data%kt= ktus10       ! define it as 10m speeds
         ods%data%lev = undef
-        call get_1d_real_var(input_id,'Height',rvals,rc)
+        call get_1d_var(input_id,'Height',rvals,rc)
         if (rc /= 0) return
         ods%data%xm = rvals
 
@@ -719,28 +790,28 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
         ods%data%kt= ktSST
         ods%data%lev = undef
 ! (use Station_Elevation to match diag_bin processing)
-        call get_1d_real_var(input_id,'Station_Elevation',rvals,rc)
+        call get_1d_var(input_id,'Station_Elevation',rvals,rc)
         if (rc /= 0) return
         ods%data%xm = rvals
         
      case ('  t')    ! virtual temperature
         ods%data%kt= ktTv
         where(ods%data%kx==311) ods%data%kx=304
-        call get_1d_real_var(input_id,'Obs_Minus_Forecast_unadjusted',rvals,rc)
+        call get_1d_var(input_id,'Obs_Minus_Forecast_unadjusted',rvals,rc)
         if (rc /= 0) return        
         ods%data%xm=rvals-ods%data%omf   ! fill in bias correction as xm
 
      case(' uv')  ! vector wind
         ods%data%kt(1:nobs)          = ktuu
         ods%data%kt(nobs1:nobs_ods)  = ktvv
-        call get_1d_real_var(input_id,'Height',rvals,rc)
+        call get_1d_var(input_id,'Height',rvals,rc)
         if (rc /= 0) return        
         ods%data%xm(1:nobs)         = rvals
         ods%data%xm(nobs1:nobs_ods) = rvals
 
      case(' pw')    ! total column water
         ods%data%kt      = ktTPW
-        call get_1d_real_var(input_id,'Prep_QC_Mark',rvals,rc)
+        call get_1d_var(input_id,'Prep_QC_Mark',rvals,rc)
         if (rc /= 0) return       
         ods%data%xm = rvals
         
@@ -800,6 +871,199 @@ subroutine ods_diagnc4(fname, nymd, nhms, ods, rc)
   end if
 
   call getodsmeta( ods )
+
+! The initial implementation of sensitivity calculation attempts to put the
+! sensitivity data into an array arranged in the same way as the data in the
+! binary files (except of course with only the sensitivity information) and
+! calls the same m_ods_obsdiags routines in the same way to produce the same
+! result (hopefully) as for the binary diag files.  Later on more efficient
+! routines to process the data can be worked out.
+
+  if (lobsdiagsave) then
+
+     iiuse = get_dim(input_id,'ObsDiagSave_iuse_arr_dim',rc)
+     if (rc /= 0) then
+        print *,'problem getting iuse dimension, exiting'
+        return
+     end if
+
+     if (iiuse /= miter) then
+        print *,'iuse array inconsistent with miter, exiting'
+        rc = 10
+        return
+     end if
+     
+     if (diag_type == 'uvconv') then
+        iunldpt = get_dim(input_id,'u_ObsDiagSave_nldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting nldepart dimension, exiting'
+           return
+        end if
+        iutldpt = get_dim(input_id,'u_ObsDiagSave_tldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting tldepart dimension, exiting'
+           return
+        end if
+        iuobssen = get_dim(input_id,'u_ObsDiagSave_obssen_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting obssen dimension, exiting'
+           return
+        end if
+        
+        ivnldpt = get_dim(input_id,'v_ObsDiagSave_nldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting nldepart dimension, exiting'
+           return
+        end if
+        ivtldpt = get_dim(input_id,'v_ObsDiagSave_tldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting tldepart dimension, exiting'
+           return
+        end if
+        ivobssen = get_dim(input_id,'v_ObsDiagSave_obssen_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting obssen dimension, exiting'
+           return
+        end if
+        
+! allocate arrays for reading in sensitivity information
+        allocate(obs_iuse(iiuse,nobs),u_obs_nldepart(iunldpt,nobs),   &
+             u_obs_tldepart(iutldpt,nobs),u_obs_obssen(iuobssen,nobs), &
+             v_obs_nldepart(ivnldpt,nobs),v_obs_tldepart(ivtldpt,nobs),&
+             v_obs_obssen(ivobssen,nobs),pdata(7*miter+2,nobs),stat=ierr)
+        if (ierr /= 0) then
+           print *, 'error alllocating arrays for reading data, ierr= ',ierr
+           rc = 7
+           status = nf90_close(input_id)
+           return
+        end if
+! read arrays with sensitivity information
+        call get_2d_int_var(input_id,'ObsDiagSave_iuse',obs_iuse,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'u_ObsDiagSave_nldepart',u_obs_nldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'u_ObsDiagSave_tldepart',u_obs_tldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'u_ObsDiagSave_obssen',u_obs_obssen,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'v_ObsDiagSave_nldepart',v_obs_nldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'v_ObsDiagSave_tldepart',v_obs_tldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'v_ObsDiagSave_obssen',v_obs_obssen,rc)
+        if (rc /= 0) return
+
+        ioff = 0
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = obs_iuse(jj,1:nobs)
+        enddo
+        do jj = 1,miter+1
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = u_obs_nldepart(jj,1:nobs)
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = v_obs_nldepart(jj,1:nobs)
+        end do
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = u_obs_tldepart(jj,1:nobs)
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = v_obs_tldepart(jj,1:nobs)
+        end do
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = u_obs_obssen(jj,1:nobs)
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = v_obs_obssen(jj,1:nobs)
+        end do
+
+        do i = 1,nobs
+           ods%data%Xvec(i) = 0.0
+           ods%data%Xvec(i+nobs) = 0.0
+           call ods_obsdiags(nlomx, tlomx, obimp, pdata, 0, i,  &
+                7*miter+2, nobs, undef, passed)
+           if (passed) then
+              ods%data%Xvec(i) = obimp(1)
+              ods%data%Xvec(i+nobs) = obimp(2)
+              ods%data%qcexcl(i) = 0
+              ods%data%qcexcl(i+nobs) = 0
+           end if
+        end do
+        
+        deallocate(obs_iuse, u_obs_nldepart, u_obs_tldepart,  &
+             u_obs_obssen, v_obs_nldepart, v_obs_tldepart,    &
+             v_obs_obssen, pdata)
+
+     else
+! get dimensions for sensitivity variables
+        inldpt = get_dim(input_id,'ObsDiagSave_nldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting nldepart dimension, exiting'
+           return
+        end if
+        itldpt = get_dim(input_id,'ObsDiagSave_tldepart_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting tldepart dimension, exiting'
+           return
+        end if
+        iobssen = get_dim(input_id,'ObsDiagSave_obssen_arr_dim',rc)
+        if (rc /= 0) then
+           print *,'problem getting obssen dimension, exiting'
+           return
+        end if
+
+! allocate arrays for reading in sensitivity information
+        allocate(obs_iuse(iiuse,nobs),obs_nldepart(inldpt,nobs),   &
+             obs_tldepart(itldpt,nobs),obs_obssen(iobssen,nobs),   &
+             pdata(4*miter+1,nobs),stat=ierr)
+        if (ierr /= 0) then
+           print *, 'error alllocating arrays for reading data, ierr= ',ierr
+           rc = 7
+           status = nf90_close(input_id)
+           return
+        end if
+! read arrays with sensitivity information
+        call get_2d_int_var(input_id,'ObsDiagSave_iuse',obs_iuse,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'ObsDiagSave_nldepart',obs_nldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'ObsDiagSave_tldepart',obs_tldepart,rc)
+        if (rc /= 0) return
+        call get_2d_double_var(input_id,'ObsDiagSave_obssen',obs_obssen,rc)
+        if (rc /= 0) return
+
+        ioff = 0
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = obs_iuse(jj,1:nobs)
+        enddo
+        do jj = 1,miter+1
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = obs_nldepart(jj,1:nobs)
+        end do
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = obs_tldepart(jj,1:nobs)
+        end do
+        do jj = 1,miter
+           ioff = ioff + 1
+           pdata(ioff,1:nobs) = obs_obssen(jj,1:nobs)
+        end do
+
+        do i = 1,nobs
+           ods%data%Xvec(i) = 0.0
+           call ods_obsdiags(nlomx(1), tlomx(1), obimp(1), pdata, 0, i,  &
+                4*miter+1, nobs, undef, passed)
+           if (passed) then
+              ods%data%Xvec(i) = obimp(1)
+              ods%data%qcexcl(i) = 0
+           end if
+        end do        
+        
+        deallocate(obs_iuse, obs_nldepart, obs_tldepart, obs_obssen, pdata)
+
+     end if
+  end if
   
   status = nf90_close(input_id)
 
