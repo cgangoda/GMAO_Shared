@@ -455,7 +455,7 @@
 	 end if
 
          call ozone_getisat_(satype,dplat,isis,isat)
-         if(verbose) print *, 'will read *'//trim(dplat)//'* for ', satype, ' isat = ', isat, ' nchanl = ', nchanl
+         if(verbose) print *, 'will read *'//trim(dplat)//'* for ', satype, ' isat = ', isat
 	 	 
          ios = 0	    
          ndiag = ioff0
