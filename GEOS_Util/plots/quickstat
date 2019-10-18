@@ -434,12 +434,14 @@ if( "$plots" =~ *corcmp* ) then
            set       pltdir = $SOURCE/scratch_corcmp$rmstype/$field.`date +%Y%m%d_%H%M%S`
            mkdir -p $pltdir
            cd       $pltdir ; set tmpdir = `echo $tmpdir $pltdir`
+
            if( $debug == 'TRUE' ) then
                $GRADS -l    -c "run $GEOSUTIL/plots/fcst/pltcorcmp -source $SOURCE -rc $statsrc -fields $field -rms $rmstype"
            else
                $GRADS -l -b -c "run $GEOSUTIL/plots/fcst/pltcorcmp -source $SOURCE -rc $statsrc -fields $field -rms $rmstype" &
            endif
            sleep 5
+
         end
      end
 
@@ -471,8 +473,8 @@ if( "$plots" =~ *corcmp* ) then
            else
                $GRADS -l -b -c "run $GEOSUTIL/plots/fcst/pltcorcmpz -source $SOURCE -rc $pltdir/corcmp_$exp.rc -fields $field" &
            endif
-
            sleep 5
+
         endif
         end
 
@@ -502,8 +504,8 @@ if( "$plots" =~ *corcmp* ) then
            else
                $GRADS -l -b -c "run $GEOSUTIL/plots/fcst/pltrmscmpz -source $SOURCE -rc $pltdir/corcmp_$exp.rc -fields $field -rms $rmstype" &
            endif
-
            sleep 5
+
            end
         endif
         end
@@ -539,7 +541,7 @@ if( "$plots" =~ *pltsys* ) then
         else
                                       set levels =  $level
             if( "$level" == "HORIZ" ) set levels = `echo 1000 975 950 925 900 850 800 750 700 600 500 400 300 250 200 150 100`
-            if( "$level" == "ZONAL" ) set levels = `echo zonal`
+            if( "$level" == "ZONAL" ) set levels = `echo ZONAL`
 
             foreach level  ( $levels )
                set       pltdir = $SOURCE/scratch_pltsys/EXP${exp}_${field}_${level}.`date +%Y%m%d_%H%M%S`
@@ -556,16 +558,17 @@ if( "$plots" =~ *pltsys* ) then
      end
      end
      wait
-     set  files = `find $SOURCE/scratch_pltsys -name MONTHLAB.txt`
-     set SEASON = `cat $files[1]`
-     foreach exp   ($exps)
-        set DESC = `cat $statsrc | grep DSC$exp | grep -v \# | grep -v \* | grep : | cut -d: -f2`
-        set   sysfiles = `/bin/ls -1 $SOURCE/$DESC/*fma*.nc3`
-        if( $#sysfiles == 6 ) then
-            $GEOSUTIL/plots/grads_util/make_syserr $SOURCE/$DESC
-            /bin/mv $SOURCE/$DESC/syserr_${DESC}.nc4 $SOURCE/${DESC}_syserr_${SEASON}.nc4
-        endif
-     end
+   # set  files = `find $SOURCE/scratch_pltsys -name MONTHLAB.txt`
+   # set SEASON = `cat $files[1]`
+   # foreach exp   ($exps)
+   #    set DESC = `cat $statsrc | grep DSC$exp | grep -v \# | grep -v \* | grep : | cut -d: -f2`
+   #    set   sysfiles = `/bin/ls -1 $SOURCE/$DESC/*fma*.nc3`
+   #    if( $#sysfiles == 56 ) then
+   #        $GEOSUTIL/plots/grads_util/make_syserr $SOURCE/$DESC
+   #        set expdsc = `cat $statsrc | grep "DESC:" | cut -d: -f2`
+   #        /bin/mv $SOURCE/$DESC/syserr_${DESC}.nc4 $SOURCE/${DESC}_syserr_${expdsc}_${SEASON}.nc4
+   #    endif
+   # end
     /bin/rm -r $tmpdir
 endif
 
@@ -592,7 +595,7 @@ if( "$plots" =~ *syscmp* ) then
            else
                                          set levels =  $level
                if( "$level" == "HORIZ" ) set levels = `echo 1000 975 950 925 900 850 800 750 700 600 500 400 300 250 200 150 100`
-               if( "$level" == "ZONAL" ) set levels = `echo zonal`
+               if( "$level" == "ZONAL" ) set levels = `echo ZONAL`
 
                foreach level  ( $levels )
                set       pltdir = $SOURCE/scratch_syscmp/EXP${exp}_${field}_${level}.`date +%Y%m%d_%H%M%S`

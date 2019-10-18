@@ -146,15 +146,19 @@ endwhile
 'draw string 10.5477 'y' 'gg 
    
 if( xpos =  1 ) ; region = "Global"                                     ;  reg = "GLO"  ; endif
-if( xpos =  2 ) ; region = "Northern Hemisphere ExtraTropics"           ;  reg = "NHE"  ; endif
-if( xpos =  3 ) ; region = "Tropics"                                    ;  reg = "TRO"  ; endif
-if( xpos =  4 ) ; region = "Southern Hemisphere ExtraTropics"           ;  reg = "SHE"  ; endif
+if( xpos =  2 ) ; region = "N.Hem. ExtraTropics (Lats: 20,80)"          ;  reg = "NHE"  ; endif
+if( xpos =  3 ) ; region = "Tropics (Lats: -20,20)"                     ;  reg = "TRO"  ; endif
+if( xpos =  4 ) ; region = "S.Hem. ExtraTropics (Lats: -20,-80)"        ;  reg = "SHE"  ; endif
 if( xpos =  5 ) ; region = "N.W. Quadrant (Lons:-180,0  Lats: 0, 90)"   ;  reg = "NWQ"  ; endif
 if( xpos =  6 ) ; region = "N.E. Quadrant (Lons: 0,180  Lats: 0, 90)"   ;  reg = "NEQ"  ; endif
 if( xpos =  7 ) ; region = "S.W. Quadrant (Lons:-180,0  Lats: 0,-90)"   ;  reg = "SWQ"  ; endif
 if( xpos =  8 ) ; region = "S.E. Quadrant (Lons: 0,180  Lats: 0,-90)"   ;  reg = "SEQ"  ; endif
 if( xpos =  9 ) ; region = "North America (Lons:-140,-60  Lats: 20,60)" ;  reg = "NAM"  ; endif
 if( xpos = 10 ) ; region = "Europe (Lons:-10,30  Lats: 30,60)"          ;  reg = "EUR"  ; endif
+if( xpos = 11 ) ; region = "N.Polar (Lats: 60,90)"                      ;  reg = "NPO"  ; endif
+if( xpos = 12 ) ; region = "S.Polar (Lats: -60,-90)"                    ;  reg = "SPO"  ; endif
+if( xpos = 13 ) ; region = "X.Polar (Lats: -60,60)"                     ;  reg = "XPO"  ; endif
+
 
 if( fday = 5 )
    'set string 1 c 6'

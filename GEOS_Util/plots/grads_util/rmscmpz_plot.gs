@@ -11,6 +11,8 @@ desc  = ''
 rms   = 0
 fact  = 2
 
+PLOT  = TRUE
+
        num = 0
 while( num < numargs )
        num = num + 1
@@ -20,6 +22,7 @@ if( subwrd(args,num)='-desc'   ) ; desc   = subwrd(args,num+1) ; endif
 if( subwrd(args,num)='-debug'  ) ; debug  = subwrd(args,num+1) ; endif
 if( subwrd(args,num)='-rms'    ) ; rms    = subwrd(args,num+1) ; endif
 if( subwrd(args,num)='-fact'   ) ; fact   = subwrd(args,num+1) ; endif
+if( subwrd(args,num)='-NOPLOT' ) ; PLOT   = FALSE              ; endif
 endwhile
                                    mexps  = numexp-1
        num = 0
@@ -125,15 +128,18 @@ endif
          ypos  = result
 
 if( xpos =  1 ) ; region = "Global"                                     ;  reg = "GLO"  ; endif
-if( xpos =  2 ) ; region = "Northern Hemisphere ExtraTropics"           ;  reg = "NHE"  ; endif
-if( xpos =  3 ) ; region = "Tropics"                                    ;  reg = "TRO"  ; endif
-if( xpos =  4 ) ; region = "Southern Hemisphere ExtraTropics"           ;  reg = "SHE"  ; endif
+if( xpos =  2 ) ; region = "N.Hem. ExtraTropics (Lats: 20,80)"          ;  reg = "NHE"  ; endif
+if( xpos =  3 ) ; region = "Tropics (Lats: -20,20)"                     ;  reg = "TRO"  ; endif
+if( xpos =  4 ) ; region = "S.Hem. ExtraTropics (Lats: -20,-80)"        ;  reg = "SHE"  ; endif
 if( xpos =  5 ) ; region = "N.W. Quadrant (Lons:-180,0  Lats: 0, 90)"   ;  reg = "NWQ"  ; endif
 if( xpos =  6 ) ; region = "N.E. Quadrant (Lons: 0,180  Lats: 0, 90)"   ;  reg = "NEQ"  ; endif
 if( xpos =  7 ) ; region = "S.W. Quadrant (Lons:-180,0  Lats: 0,-90)"   ;  reg = "SWQ"  ; endif
 if( xpos =  8 ) ; region = "S.E. Quadrant (Lons: 0,180  Lats: 0,-90)"   ;  reg = "SEQ"  ; endif
 if( xpos =  9 ) ; region = "North America (Lons:-140,-60  Lats: 20,60)" ;  reg = "NAM"  ; endif
 if( xpos = 10 ) ; region = "Europe (Lons:-10,30  Lats: 30,60)"          ;  reg = "EUR"  ; endif
+if( xpos = 11 ) ; region = "N.Polar (Lats: 60,90)"                      ;  reg = "NPO"  ; endif
+if( xpos = 12 ) ; region = "S.Polar (Lats: -60,-90)"                    ;  reg = "SPO"  ; endif
+if( xpos = 13 ) ; region = "X.Polar (Lats: -60,60)"                     ;  reg = "XPO"  ; endif
 
 
 filebeg  = 1
@@ -241,7 +247,7 @@ while( m<=mexps )
          ndayloc = (tdim-toff.m.n) * tinc / 24
          tmax    = toff.m.n + ndayloc*(24/tinc)
          tbeg.m  = toff.m.n -(tmax-tdim)
-         tdim.m  = tbeg.m + nday*(24/tinc)
+         tdim.m = tbeg.m + nday*(24/tinc)
 
 if( tdim.m < tdim.0 )
     tdif.m = tdim.m
@@ -297,7 +303,6 @@ while( m<=mexps )
 'set t  'tbeg.m' 'tdim.m
 'define  zave'm' = 0.0'
 'define  zvar'm' = 0.0'
-*pause '   DFILE: 'n.m'   Defined zave'm' and zvar'm
 m = m+1
 endwhile
 
@@ -312,7 +317,6 @@ while( m<=mexps )
 'set t  'tbeg.m' 'tdif.m
 'define zaved'm' = 0.0'
 'define zvard'm' = 0.0'
-*pause '   DFILE: 'ddif.m'   Defined zaved'm' and zvard'm
 m = m+1
 endwhile
 
@@ -375,7 +379,6 @@ n = n + 1
 endwhile
 m = m + 1
 endwhile
-*pause ' Finished New Fisher Transform Variable znem'
 
 say ' Define New Fisher Transform Variable zdnem ...'
 m = 0
@@ -427,7 +430,6 @@ n = n + 1
 endwhile
 m = m + 1
 endwhile
-*pause ' Finished makezdif2'
 
 * Compute Mean
 * ------------
@@ -441,10 +443,10 @@ while ( n <= fileend )
 'set dfile 'd.m
 'set lev 1000 100'
 'set t 'tbeg.m' 'tdim.m
-                 'define  zave'm' =   zave'm' +   z'n'e'm
+'define  zave'm' =  zave'm' +  z'n'e'm
 n = n + 1
 endwhile
-                 'define   zave'm' =   zave'm'/'numfiles
+'define  zave'm' =  zave'm'/'numfiles
 m = m + 1
 endwhile
 *say 'Hit Enter to continue ...'
@@ -458,10 +460,10 @@ while ( n <= fileend )
 'set dfile 'ddif.m
 'set lev 1000 100'
 'set t 'tbeg.m' 'tdif.m
-                 'define  zaved'm' =  zaved'm' +  zd'n'e'm
+'define zaved'm' = zaved'm' + zd'n'e'm
 n = n + 1
 endwhile
-                 'define  zaved'm' =  zaved'm'/'numfiles
+'define zaved'm' = zaved'm'/'numfiles
 m = m + 1
 endwhile
 *say 'Hit Enter to continue ...'
@@ -480,7 +482,7 @@ while ( n <= fileend )
 'set dfile 'd.m
 'set lev 1000 100'
 'set t 'tbeg.m' 'tdim.m
-                 'define  zvar'm'  =  zvar'm'  + pow(  z'n'e'm' - zave'm',2 )'
+'define  zvar'm' =  zvar'm' + pow(  z'n'e'm'- zave'm',2 )'
 n = n + 1
 endwhile
 'define  zvar'm' =  zvar'm'/('numfiles'-1)'
@@ -497,7 +499,7 @@ while ( n <= fileend )
 'set dfile 'ddif.m
 'set lev 1000 100'
 'set t 'tbeg.m' 'tdif.m
-                 'define zvard'm'  = zvard'm'  + pow( zd'n'e'm' -zaved'm',2 )'
+'define zvard'm' = zvard'm' + pow( zd'n'e'm'-zaved'm',2 )'
 n = n + 1
 endwhile
 'define zvard'm' = zvard'm'/('numfiles'-1)'
@@ -511,18 +513,25 @@ endwhile
 * ------------------------------------------------------------------------
  dof = numfiles-1    ;* Degrees of Freedom (dof)
 
+'astudt 'dof' 0.0001'  ;* 99.99% Confidence, and Minimum Value used for Shading
+'q defval astudtout 1 1'
+critval9999=subwrd(result,3)
+
 'astudt 'dof' 0.01'  ;* 99% Confidence
 'q defval astudtout 1 1'
 critval99=subwrd(result,3)
 
 'astudt 'dof' 0.05'  ;* 95% Confidence
 'q defval astudtout 1 1'
-critval95 = subwrd(result,3)
+critval95=subwrd(result,3)
+
+'astudt 'dof' 0.10'  ;* 90% Confidence
+'q defval astudtout 1 1'
+critval90=subwrd(result,3)
 
 'astudt 'dof' 0.32'  ;* 68% Confidence
 'q defval astudtout 1 1'
 critval68=subwrd(result,3)
-
 
 * Estimate Statistically Significant Range for Zero-Mean Hypothesis in a Paired t-Test)
 * -------------------------------------------------------------------------------------
@@ -534,17 +543,25 @@ while( m<=mexps )
 'set t 'tbeg.m' 'tdif.m
 'define se  = sqrt( zvard'm'/'numfiles' )'
 
-'define dx99  = se*'critval99
-'define rUp99'm' =  pow( abs(zave0+dx99),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
-'define rLp99'm' =  pow( abs(zave0-dx99),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define dx = se*'critval9999
+'define rUp9999'm' =  pow( abs(zave0+dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define rLp9999'm' =  pow( abs(zave0-dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
 
-'define dx95  = se*'critval95
-'define rUp95'm' =  pow( abs(zave0+dx95),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
-'define rLp95'm' =  pow( abs(zave0-dx95),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define dx = se*'critval99
+'define rUp99'm' =  pow( abs(zave0+dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define rLp99'm' =  pow( abs(zave0-dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
 
-'define dx68  = se*'critval68
-'define rUp68'm' =  pow( abs(zave0+dx68),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
-'define rLp68'm' =  pow( abs(zave0-dx68),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define dx = se*'critval95
+'define rUp95'm' =  pow( abs(zave0+dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define rLp95'm' =  pow( abs(zave0-dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+
+'define dx = se*'critval90
+'define rUp90'm' =  pow( abs(zave0+dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define rLp90'm' =  pow( abs(zave0-dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+
+'define dx = se*'critval68
+'define rUp68'm' =  pow( abs(zave0+dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
+'define rLp68'm' =  pow( abs(zave0-dx),'irmsfact' ) - pow( abs(zave0),'irmsfact' )'
 
 m = m + 1
 endwhile
@@ -582,6 +599,10 @@ m = m + 1
 endwhile
 
 
+************************************************************************
+if( PLOT = TRUE )
+************************************************************************
+
 * Plot Fisher Mean for Experiments
 * --------------------------------
 say '  Plot Fisher Mean for Experiments'
@@ -606,6 +627,7 @@ while( m<=mexps )
 'set dfile 'd.m
 'set lev 1000 100'
 'set t 'tbeg.m' 'tdim.m
+
 'set vpage off'
 'set grads off'
 'set gxout contour'
@@ -651,7 +673,7 @@ say 'EXP'm'  Field: 'name'  Region: 'region
 
 if( nday = ndaymax )
    'myprint -name 'SOURCE'/corcmp/'expdsc.m'_'expdsc.m'_stats_'label'_rmscmp'rms_label'_'reg'_z_'months' -rotate 90 -density 100x100'
-else 
+else
    'myprint -name 'SOURCE'/corcmp/'expdsc.m'_'expdsc.m'_stats_'label'_rmscmp'rms_label'_'reg'_z_'months'_'nday'DAY -rotate 90 -density 100x100'
 endif
 if( debug = "TRUE" )
@@ -663,27 +685,23 @@ endif
 m = m + 1
 endwhile
 
+************************************************************************
+endif
+************************************************************************
+
 
 * Plot Difference plus Significance
 * ---------------------------------
-
-    m = 1
-    while( m<=mexps )
+m = 1
+while( m<=mexps )
        n  = filebeg
        d.m = 1 + m*numfiles
 
 mfile = 1 + m*files_per_month
 
-flag = ''
-while( flag = '' )
-'set vpage off'
-'set grads off'
-'set grid  off'
-'set gxout contour'
-'set parea 2.25 9.75 1.0 7.5'
-'set xaxis 0 'nday' .5'
-'set string 1 c 6 0'
 
+* Compute RMS difference between ravem and rave0: ravediff
+* --------------------------------------------------------
 'set dfile 'ddif.m
 'set t 'tbeg.m' 'tdif.m
 'makezdif3 -q1  rave'm' -file1 'mfile' -q2 rave0  -file2 1  -ptop 100 -name rave'
@@ -691,6 +709,17 @@ while( flag = '' )
          newfile = result
 'close ' newfile
 
+* Compute difference between 99.99% Confidence and zero: rUp9999diff
+* ------------------------------------------------------------------
+'set dfile 'ddif.m
+'set t 'tbeg.m' 'tdif.m
+'makezdif3 -q1   rUp9999'm' -file1 'mfile' -q2  zero  -file2 1  -ptop 100 -name  rUp9999'
+'getinfo numfiles'
+         newfile = result
+'close ' newfile
+
+* Compute difference between 99% Confidence and zero: rUp99diff
+* -------------------------------------------------------------
 'set dfile 'ddif.m
 'set t 'tbeg.m' 'tdif.m
 'makezdif3 -q1   rUp99'm' -file1 'mfile' -q2  zero  -file2 1  -ptop 100 -name  rUp99'
@@ -698,6 +727,8 @@ while( flag = '' )
          newfile = result
 'close ' newfile
 
+* Compute difference between 95% Confidence and zero: rUp95diff
+* -------------------------------------------------------------
 'set dfile 'ddif.m
 'set t 'tbeg.m' 'tdif.m
 'makezdif3 -q1   rUp95'm' -file1 'mfile' -q2  zero  -file2 1  -ptop 100 -name  rUp95'
@@ -705,6 +736,17 @@ while( flag = '' )
          newfile = result
 'close ' newfile
 
+* Compute difference between 90% Confidence and zero: rUp90diff
+* -------------------------------------------------------------
+'set dfile 'ddif.m
+'set t 'tbeg.m' 'tdif.m
+'makezdif3 -q1   rUp90'm' -file1 'mfile' -q2  zero  -file2 1  -ptop 100 -name  rUp90'
+'getinfo numfiles'
+         newfile = result
+'close ' newfile
+
+* Compute difference between 68% Confidence and zero: rUp68diff
+* -------------------------------------------------------------
 'set dfile 'ddif.m
 'set t 'tbeg.m' 'tdif.m
 'makezdif3 -q1   rUp68'm' -file1 'mfile' -q2  zero  -file2 1  -ptop 100 -name  rUp68'
@@ -715,77 +757,205 @@ while( flag = '' )
 'set gxout shaded'
 'rgbset'
 
-'set t 'tdif.m
-'minmax rUp95diff'
- dcint = subwrd(result,1) * 1000 / 6
-
-* WMP
-* Fixed Color Scales to better judge magnitude of change...
-'run uppercase 'field
-                FIELD = result
-*if (FIELD='H') ; dcint = 750.000 ; endif
-*if (FIELD='U') ; dcint =  90.000 ; endif
-*if (FIELD='V') ; dcint =  90.000 ; endif
-*if (FIELD='T') ; dcint =  30.000 ; endif
-*if (FIELD='Q') ; dcint =   0.012 ; endif
-
+* Define New Variables for Montage Plots
+* -------------------------------------
 'set dfile 'ddif.m
 'set t 'tbeg.m' 'tdif.m
+
+* For ravediff > 0
+* ----------------
+'define sigdiffp90   = 1000 * ( ravediff-rUp90diff )'
+'define sigdiffp95   = 1000 * ( ravediff-rUp95diff )'
+'define sigdiffp99   = 1000 * ( ravediff-rUp99diff )'
+
+* For ravediff < 0
+* ----------------
+'define sigdiffm90 = 1000 * ( ravediff+rUp90diff )'
+'define sigdiffm95 = 1000 * ( ravediff+rUp95diff )'
+'define sigdiffm99 = 1000 * ( ravediff+rUp99diff )'
+
+'define maskm90 = ( sigdiffm90 - abs(sigdiffm90) )/2'
+'define maskm95 = ( sigdiffm95 - abs(sigdiffm95) )/2'
+'define maskm99 = ( sigdiffm99 - abs(sigdiffm99) )/2'
+
+'define maskp90 = ( sigdiffp90 + abs(sigdiffp90) )/2'
+'define maskp95 = ( sigdiffp95 + abs(sigdiffp95) )/2'
+'define maskp99 = ( sigdiffp99 + abs(sigdiffp99) )/2'
+
+'define sigdiff90 = maskm90 + maskp90'
+'define sigdiff95 = maskm95 + maskp95'
+'define sigdiff99 = maskm99 + maskp99'
+
+'define sigdiffp9999 = 1000 * ( rUp9999diff-rUp90diff )'
+
+* Find maximum value of sigdiff90 across all levels and times
+* -----------------------------------------------------------
+'set dfile 'ddif.m
+'set t 'tbeg.m' 'tdif.m
+
+' minmax sigdiff90'
+
+    qmax = subwrd(result,1)
+    qmin = subwrd(result,2)
+
+    xmax = subwrd(result,3)
+    ymax = subwrd(result,4)
+    zmax = subwrd(result,7)
+    tmax = subwrd(result,9)
+
+    xmin = subwrd(result,5)
+    ymin = subwrd(result,6)
+    zmin = subwrd(result,8)
+    tmin = subwrd(result,10)
+
+    qmax = math_abs(qmax)
+    qmin = math_abs(qmin)
+
+if( qmin > qmax )
+    qmax = qmin
+    xmax = xmin
+    ymax = ymin
+    zmax = zmin
+    tmax = tmin
+endif
+
+* Compare maximum value of sigdiff90 to 99.99% Confidence Difference
+* ------------------------------------------------------------------
+'set t 'tmax
+'set z 'zmax
+'getinfo level'
+         level = result
+'d sigdiff90'
+     qtmp90 = subwrd(result,4)
+'d sigdiffp9999'
+     qtmp = subwrd(result,4)
+say 'initial qmax = 'qmax
+say 'tmax = 'tmax
+say 'zmax = 'zmax' level: 'level
+say 'sigdiffp9999: 'qtmp
+say 'sigdiff90: 'qtmp90
+
+if( qtmp > qmax )
+    qmax = qtmp
+endif
+say '  final qmax = 'qmax
+
+'set t 'tbeg.m' 'tdif.m
+'set lev 1000 100'
+
+   dcint = qmax / 9
+
+if( PLOT = FALSE )
+  if( xpos=2 ) ; 'run setenv DCINT_'field'_rms'rms'.'xpos' 'dcint ; say 'DCINT_'field'_rms'rms'.'xpos' = 'dcint ; endif
+  if( xpos=3 ) ; 'run setenv DCINT_'field'_rms'rms'.'xpos' 'dcint ; say 'DCINT_'field'_rms'rms'.'xpos' = 'dcint ; endif
+  if( xpos=4 ) ; 'run setenv DCINT_'field'_rms'rms'.'xpos' 'dcint ; say 'DCINT_'field'_rms'rms'.'xpos' = 'dcint ; endif
+endif
+
+************************************************************************
+if( PLOT = TRUE )
+************************************************************************
+
+'run getenv DCINT_'field'_rms'rms'.2'
+                             DCINT.2 = result
+'run getenv DCINT_'field'_rms'rms'.3'
+                             DCINT.3 = result
+'run getenv DCINT_'field'_rms'rms'.4'
+                             DCINT.4 = result
+
+dcint = DCINT.2
+    if( DCINT.3 > dcint ) ; dcint = DCINT.3 ; endif
+    if( DCINT.4 > dcint ) ; dcint = DCINT.4 ; endif
+
+flag = ''
+while( flag = '' )
+'set vpage off'
+'set grads off'
+'set grid  off'
+'set parea 2.25 9.75 1.0 7.5'
+'set xaxis 0 'nday' .5'
+'set string 1 c 6 0'
+
+'set datawarn off'
+
+* Shade where sigdiff > 90% confidence error bar (color shaded)
+* -------------------------------------------------------------
+ ' rgbset'
+ ' set gxout grfill '
+ ' set csmooth off'
+ ' shades 'dcint
+ ' run getenv SHADES_CLEVS'
+              SHADES_CLEVS = result
+
+  clevs = subwrd( SHADES_CLEVS,1 )
+  ii = 2
+  while( ii <= 9 )
+  clev  = subwrd( SHADES_CLEVS,ii )
+  clevs = clevs' 'clev
+  ii = ii + 1
+  endwhile
+  clevs = clevs'  -0.0001 0.0001 '
+  ii = 10
+  while( ii <= 18 )
+  clev  = subwrd( SHADES_CLEVS,ii )
+  clevs = clevs' 'clev
+  ii = ii + 1
+  endwhile
+
+ 'set clevs 'clevs
+ 'set ccols 59 57 55 47 44 37 36 34 33 31 0 20 21 22 23 24 25 26 27 28 29'
+
+*' set gxout shaded '
+ ' d sigdiff90 '
+ ' cbarn -xmid 6 -snum 0.70 -ndot 1'
+
+* Contour sigdiff that is = 90, 95, & 99% confidence diffs (black lines without label)
+* ------------------------------------------------------------------------------------
+'set gxout contour'
 'set csmooth on'
-
-* Draw 95% confidence colored shading and colorbar
-'set gxout shaded'
-'set datawarn off'
-'shades 'dcint
-'d maskout( ravediff*1000, abs(ravediff)-rUp95diff )'
-'cbarn -xmid 6 -snum 0.6'
-
-* Draw 68% confidence colored contours
-'set gxout contour'
 'set clab off'
+
+'set cstyle 2'
 'set cthick 8'
-'set datawarn off'
-'shades 'dcint
-'d maskout( ravediff*1000, abs(ravediff)-rUp68diff )'
-
-* Draw 99% confidence black contours without labels
-'set gxout contour'
-'set clab off'
-'set cthick 6'
-'set cint 'dcint
 'set ccolor 1'
-'set datawarn off'
-'d maskout( ravediff*1000,  abs(ravediff)-rUp99diff )'
+'set clevs  0'
+'d sigdiffp99'
+'set cstyle 2'
+'set cthick 8'
+'set ccolor 1'
+'set clevs  0'
+'d sigdiffm99'
+
+'set cstyle 6'
+'set cthick 4'
+'set ccolor 1'
+'set clevs  0'
+'d sigdiffp95'
+'set cstyle 6'
+'set cthick 4'
+'set ccolor 1'
+'set clevs  0'
+'d sigdiffm95'
+
+'set cstyle 1'
+'set cthick 1'
+'set ccolor 1'
+'set clevs  0'
+'d sigdiffp90'
+'set cstyle 1'
+'set cthick 1'
+'set ccolor 1'
+'set clevs  0'
+'d sigdiffm90'
 
 * reset some background values
+* ----------------------------
 'set datawarn on'
 'set clab on'
 
-* Re-Draw Individual Plots
-* ------------------------
-'set gxout contour'
-'set clab  on'
-'set xaxis 0 'nday' .5'
-'set cmark  0'
-'set cthick 6'
-'set ccolor rainbow'
-'set rbrange 0 'qmax
-'set cint 'qcnt
-'set cstyle 2'
-*'d ravem'
-'set cmark  0'
-'set cthick 6'
-'set ccolor rainbow'
-'set rbrange 0 'qmax
-'set cint 'qcnt
-'set cstyle 3'
-*'d raveo'
-
+* Draw Labels
+* -----------
 'draw ylab Pressure (hPa)'
 'set  string 1 c 6 0'
-
-'set  strsiz .132'
-'draw string 6.0 8.15 'expdsc.m' - 'expdsc.0' ('numfiles')   'region
 
     if( rms = 0 ) ; rms_label = 'Root Mean Square Error Difference'   ; endif
     if( rms = 1 ) ; rms_label = 'RMS for RANDOM Error Difference'     ; endif
@@ -793,14 +963,31 @@ while( flag = '' )
     if( rms = 3 ) ; rms_label = 'RMS for AMPLITUDE Error Difference'  ; endif
     if( rms = 4 ) ; rms_label = 'RMS for PHASE Error Difference'      ; endif
 
-'draw string 6.0 7.8 'name'   'rms_label' (x10`a-3`n)'
+dcintx = dcint * 100
+'getint 'dcintx
+         dcintx = result / 100
+
+'set  strsiz .132'
+'draw string 6.0 8.15 'expdsc.m' - 'expdsc.0' ('numfiles')   'name'   'region
+'draw string 6.0 7.90 'rms_label'  (x10`a-3`n)'
+'set  strsiz .125'
+'draw string 6.0 7.65 'desc
 'set  strsiz .12'
 'draw string 6.0 0.72 Forecast Day'
+
+'run uppercase 'field
+                FIELD = result
 
 'set  string 1 l 8 0'
 'set  strsiz .32'
 'draw string 0.70 7.38 'reg
 'draw string 0.70 7.01 'FIELD
+
+'set  string 1 l 3 0'
+'set  strsiz .087'
+'draw string 0.23 1.50 Thin  Solid Line (>90%)'
+'draw string 0.23 1.35 Dot -Dash Line (>95%)'
+'draw string 0.23 1.20 Long-Dash Line (>99%)'
 
 'set  string 1 c 6 90'
 'set  strsiz .18'
@@ -821,7 +1008,6 @@ if( nday = ndaymax )
 else
    'myprint -name 'SOURCE'/corcmp/'expdsc.0'_'expdsc.m'_stats_'label'_rmscmp'rms_label'_'reg'_z_'months'_'nday'DAY -rotate 90 -density 100x100'
 endif
-
 if( debug = "TRUE" )
     say "Hit ENTER for next plot"
     pull flag
@@ -831,8 +1017,13 @@ endif
 'c'
 endwhile
 
+************************************************************************
+endif
+************************************************************************
+
 m = m + 1
 endwhile
+
 return
 
 function getlength (string)
