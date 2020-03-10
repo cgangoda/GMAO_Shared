@@ -318,7 +318,7 @@
      8                 'no impact due to advected local '/)
 
 
-      integer, parameter :: nsats = 48
+      integer, parameter :: nsats = 49
       character(len=*), parameter :: sats(nsats)=(/
      .                 'hirs2           ', 'hirs3           ', 'hirs4           ',
      .                 'msu             ', 'ssu             ', 'sndr            ',
@@ -335,7 +335,8 @@
      .                 'mls30           ', 'mls55           ', 'ompslp          ',
      .                 'tmi             ', 'gmi             ', 'acos            ',
      .                 'mopitt          ', 'cris-fsr        ', 'ompslpuv        ', 
-     .                 'ompslpvis       ', 'ompsnm          ', 'ompsnp          '  /)
+     .                 'ompslpvis       ', 'ompsnm          ', 'ompsnp          ',
+     .                 'amsr2           '/)
 
 ! note: numbers below were made up for MHS, and SSU
 ! note: CRIS and ATMS numbers assigned at will
@@ -357,7 +358,8 @@
      .                 325               , 330               , 335               ,
      .                 705               , 706               , 998               ,
      .                 999               , 940               , 335               ,
-     .                 336               , 427               , 437 /)
+     .                 336               , 427               , 437               ,
+     .                 550               /)
 
       integer, parameter :: npcp = 4
       character(len=*), parameter :: pcpt(npcp)=(/
