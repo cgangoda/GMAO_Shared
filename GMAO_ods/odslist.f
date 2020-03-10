@@ -480,7 +480,7 @@
       print *
       print *, 'odslist - Create ASCII Listing from ODS File'
       print *
-      print *, 'Usage:  odslist [-strip] [-nosort] [-ncf]',
+      print *, 'Usage:  odslist [-strip] [-nosort] [-ncf] [-prepsigo]',
      .                     '[-synhour HH] [-o FNAME] odsfile'
       print *
       print *, 'where'
@@ -493,6 +493,8 @@
       print *, '                (default: do)'
       print *, '-ncf             specify when input files are non-ODS files'
       print *, '                (default: ignore)'
+      print *, '-prepsigo        write original obs error from prepbufr for -ncf files'
+      print *, '                (default: write modified error from GSI)'
       print *, '-synhour HH      process synoptic hour HH'
       print *, '                (default: first on file)'
       print *, '-o FNAME         output file name'
