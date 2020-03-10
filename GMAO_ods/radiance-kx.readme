@@ -86,6 +86,7 @@
  amsre_low   aqua        amsre_aqua(low)                0         547
  amsre_mid   aqua        amsre_aqua(mid)                0         548
  amsre_hig   aqua        amsre_aqua(hi)                 0         549
+ amsr2       gcom-w1     amsr2_gcom-w1                  0         550
  avhrr       n15         avhrr3_n15                    15         615
  avhrr       n17         avhrr3_n17                    17         617
  avhrr       n18         avhrr3_n18                    18         618

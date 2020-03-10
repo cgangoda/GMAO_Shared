@@ -13,6 +13,7 @@
 #  kx   source      ictype      otype                   icsub
    003  gsi_conv    003         "gps_bnd,gps_ref"          0    # MetOp-B GRAS (gps)
    004  gsi_conv    004         "gps_bnd,gps_ref"          0    # MetOp-A GRAS (gps)
+   005  gsi_conv    005         "gps_bnd,gps_ref"          0    # MetOp-A GRAS (gps)    --- conflict 005
 
 #-- defined in GSI reource OBS_INPUT::
 #  dplat: platform
@@ -22,7 +23,7 @@
 #
 # see gsi.rc: OBS_INPUT::
 #  kx   source      dplat       dtype                   isat
-   005  gsi_diag    tirosn      hirs2                      5    # hirs2_tirosn
+   005  gsi_diag    tirosn      hirs2                      5    # hirs2_tirosn    --- conflict 005
    006  gsi_diag    n06         hirs2                      6    # hirs2_n06
    007  gsi_diag    n07         hirs2                      7    # hirs2_n07
    008  gsi_diag    n08         hirs2                      8    # hirs2_n08
@@ -464,6 +465,7 @@
    547  gsi_diag    aqua        amsre_low                  0    # amsre_aqua(low)
    548  gsi_diag    aqua        amsre_mid                  0    # amsre_aqua(mid)
    549  gsi_diag    aqua        amsre_hig                  0    # amsre_aqua(hi)
+   550  gsi_diag    gcom_w1     amsr2                      0    # amsr2_gcom-w1
 
 # See ODAS_OBS.xlsx
 #  kx   source      platform    var_id(kt)           data_id(ks)
@@ -577,10 +579,11 @@
 #  kx   source      ictype      otype                   icsub
    820  gsi_conv    820         "gps_bnd,gps_ref"          0    # SAC-C (gps)
    821  gsi_conv    821         "gps_bnd,gps_ref"          0    # SAC-D (gps)
+   825  gsi_conv    825         "gps_bnd,gps_ref"          0    # KOMPSAT-5 (gps)    --- conflict 825
 
 # see gsi.rc: OBS_INPUT::
 #  kx   source      dplat       dtype                   isat
-   825  gsi_diag    metop-a     mhs                       25    # mhs_metop-a
+   825  gsi_diag    metop-a     mhs                       25    # mhs_metop-a        --- conflict 825
    826  gsi_diag    metop-b     mhs                       26    # mhs_metop-b
    875  gsi_diag    metop-a     iasi                      25    # iasi616_metop-a
    876  gsi_diag    metop-b     iasi                      26    # iasi616_metop-b

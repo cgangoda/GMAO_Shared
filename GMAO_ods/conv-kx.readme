@@ -81,6 +81,7 @@
 !  GPS KX are assigned by satellite ID
         3      MetOp-B GRAS
         4      MetOp-A GRAS
+        5      MetOp-C GRAS
        41      CHAMP      
        42      TerraSAR-X
        43      TanDEM-X
@@ -97,3 +98,4 @@
       786      C/NOFS CORISS
       820      SAC-C
       821      SAC-D
+      825      KOMPSAT-5
